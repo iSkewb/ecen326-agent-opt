@@ -144,3 +144,13 @@ class AgentLLM:
             messages.append({"role": "user", "content": results})
         text = "\n".join(b.text for b in resp.content if b.type == "text")
         return {"text": text, "tool_calls": calls}
+
+
+def make_agent(role: str, model: str, system: str, transcript: Path, effort: str = "medium",
+               max_tokens: int = 16000):
+    """Pick the backend from LLM_BACKEND: "api" (Messages API, default) or "claude-code" (`claude -p`)."""
+    backend = os.environ.get("LLM_BACKEND", "api")
+    if backend == "claude-code":
+        from .claude_code import ClaudeCodeLLM
+        return ClaudeCodeLLM(role, model, system, transcript, effort, max_tokens)
+    return AgentLLM(role, model, system, transcript, effort, max_tokens)

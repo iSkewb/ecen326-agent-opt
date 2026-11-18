@@ -1,6 +1,6 @@
 # ECEN 326 final project: multi-agent amplifier optimization
 
-A Python loop around the Claude API that lets four agents (Planner, Simulation,
+A Python loop around Claude (through the API or the Claude Code CLI) that lets four agents (Planner, Simulation,
 Verification/critic, Reporting) tune the team's two-stage CMOS power amplifier for
 minimum supply power, with ngspice as the simulator. Topology and device types are
 fixed; component values and supplies are the design variables.
@@ -19,7 +19,8 @@ Private for now; to be shared with teammates and the TA later.
 | Path | What it is |
 |---|---|
 | `orchestrator.py` | the loop and command line |
-| `agents/llm.py` | Messages API wrapper: tool loop, transcripts, token and dollar accounting |
+| `agents/llm.py` | Messages API backend: tool loop, transcripts, token and dollar accounting |
+| `agents/claude_code.py` | Claude Code backend: the same agents through `claude -p` |
 | `agents/roles.py` | the four agents, plus deterministic dry-run stand-ins |
 | `agents/prompts/*.md` | each agent's role prompt |
 | `sim/netlist.py`, `sim/runner.py` | netlist templates, ngspice runs, measurements y(k) |
@@ -35,26 +36,57 @@ Private for now; to be shared with teammates and the TA later.
 ```
 sudo apt install ngspice        # ngspice-42 was used; any recent version should work
 python3 -m pip install -r requirements.txt
-cp .env.example .env            # then paste your Anthropic API key after ANTHROPIC_API_KEY=
+cp .env.example .env
 ```
 
-`.env` is gitignored, so the key never lands in the repo. Get a key at console.anthropic.com.
+Then pick how the agents reach Claude. Both run the same four agents with the same prompts,
+models and checks; only the transport differs.
+
+| Backend | Needs | Billing |
+|---|---|---|
+| `--backend api` (default) | `ANTHROPIC_API_KEY=...` in `.env` (key from console.anthropic.com) | API usage, roughly $10 to $15 per 20-iteration run (a 2-iteration test cost $1.20, mostly the Opus planner) |
+| `--backend claude-code` | Claude Code installed and signed in (`npm install -g @anthropic-ai/claude-code`, then run `claude` once) | counts against the signed-in Claude account (subscription usage, or that account's API key); a 20-iteration run takes about an hour |
+
+To make Claude Code the default, put `LLM_BACKEND=claude-code` in `.env`. `.env` is gitignored,
+so a key never lands in the repo.
+
+How the Claude Code backend works: each agent turn is one `claude -p` call with the agent's role
+prompt as the system prompt, `--model` set per agent (Opus planner, Sonnet for the rest),
+and the reply forced to JSON with `--json-schema`. Claude Code's own tools are switched off
+(`--tools ""`, no MCP servers, no settings files, no slash commands) and each call runs in an
+empty scratch folder, so an agent can only answer. The JSON names one of the loop's tools
+(for example `propose_candidate` or `run_simulation`); Python runs that tool, including
+ngspice, and sends the result back in the next call.
 
 ## Running
 
 ```
-python3 orchestrator.py --dry-run          # no key needed: tests ngspice, checks and reports
-python3 orchestrator.py                    # the real agent run (about $5 to $10 for 20 iterations)
-python3 orchestrator.py --ol-method loop_break   # use the loop-break open-loop measurement
-python3 -m sim.baseline                    # re-simulate the hand design into baseline/
+python3 orchestrator.py --dry-run                     # no Claude at all: tests ngspice, checks and reports
+python3 orchestrator.py                               # agent run through the API
+python3 orchestrator.py --backend claude-code         # agent run through Claude Code
+python3 orchestrator.py --ol-method loop_break        # use the loop-break open-loop measurement
+python3 -m sim.baseline                               # re-simulate the hand design into baseline/
 ```
 
-Other flags: `--budget N`, `--max-cost DOLLARS` (default 20, stops early), `--run-dir PATH`.
+Other flags: `--budget N`, `--max-cost DOLLARS` (default 20, stops early; with Claude Code it
+uses the equivalent API cost Claude Code reports), `--run-dir PATH`.
 Models: the Planner uses `claude-opus-5-5`; the other three use `claude-sonnet-5-5`
 (override with `PLANNER_MODEL` / `WORKER_MODEL` in `.env`).
 
 A dry run uses a coordinate-search planner and a code-only critic; its outputs are labeled
 DRY RUN and are not the agent result.
+
+## Re-running a result (D8)
+
+Each run folder records everything needed to check or repeat it: `config.json` (backend,
+models, budget, open-loop method), `transcripts.jsonl` (every prompt, reply and tool call),
+`records.json` (every x(k) and y(k)), and the netlists under `sims/`.
+
+* **Re-check without Claude:** every candidate can be re-simulated from `records.json` with
+  `sim.runner.simulate`, and `sim/specs.py` re-derives every pass/fail. No account is needed.
+* **Repeat the whole agent run:** use either backend; a TA can use an API key or their own
+  Claude Code sign-in. LLM output is not deterministic, so a repeat follows a different path;
+  compare the best feasible design and its checks, not the exact sequence.
 
 ## Outputs (runs/&lt;timestamp&gt;/)
 
@@ -68,7 +100,7 @@ DRY RUN and are not the agent result.
 | `D6_final_design/` | final netlists, full simulation set and plots of the best design |
 | `D7_agent_errors.md` | rejected proposals, transcription errors, critic/code disagreements |
 | `SUMMARY.md` | the reporting agent's summary |
-| `transcripts.jsonl` | every API request, response and tool call (D8 reproducibility) |
+| `transcripts.jsonl` | every request, response and tool call, either backend (D8 reproducibility) |
 | `records.json`, `config.json`, `cost.json`, `run.log` | raw records, settings, token use and cost |
 
 Raw waveform `.txt` files under `runs/` are gitignored (large); netlists, logs and

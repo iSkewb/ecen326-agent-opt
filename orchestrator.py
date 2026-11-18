@@ -2,7 +2,8 @@
 """Multi-agent optimization loop for the ECEN 326 final project amplifier.
 
     python orchestrator.py --dry-run            # no API key needed: deterministic stand-in agents
-    python orchestrator.py                      # Claude agents (needs ANTHROPIC_API_KEY in .env)
+    python orchestrator.py                      # Claude agents via the API (needs ANTHROPIC_API_KEY in .env)
+    python orchestrator.py --backend claude-code  # Claude agents via the local `claude -p` CLI (no API key)
     python orchestrator.py --baseline-only      # simulate and report the hand design only
 
 Loop per iteration k (one simulator call = one unit of budget):
@@ -51,14 +52,26 @@ def main():
     ap.add_argument("--budget", type=int, default=20, help="simulator calls for candidates (baseline not counted)")
     ap.add_argument("--ol-method", choices=["follower", "loop_break"], default="follower",
                     help="open-loop gain/bandwidth measurement used for the av_ol and f3db_ol constraints")
+    ap.add_argument("--backend", choices=["api", "claude-code"], default=None,
+                    help="how the agents reach Claude: the Messages API (needs ANTHROPIC_API_KEY) or the "
+                         "Claude Code CLI `claude -p` (uses the account claude is signed in to). "
+                         "Default: LLM_BACKEND from .env, else api")
     ap.add_argument("--baseline-only", action="store_true")
     ap.add_argument("--max-cost", type=float, default=20.0, help="stop early if API spend passes this many dollars")
     ap.add_argument("--run-dir", type=Path, default=None)
     a = ap.parse_args()
     load_env()
 
-    if not a.dry_run and not a.baseline_only and not os.environ.get("ANTHROPIC_API_KEY"):
-        sys.exit("ANTHROPIC_API_KEY is not set. Put it in .env (see .env.example) or use --dry-run.")
+    a.backend = a.backend or os.environ.get("LLM_BACKEND", "api")
+    os.environ["LLM_BACKEND"] = a.backend
+    if not a.dry_run and not a.baseline_only:
+        if a.backend == "api" and not os.environ.get("ANTHROPIC_API_KEY"):
+            sys.exit("ANTHROPIC_API_KEY is not set. Put it in .env (see .env.example), use --backend claude-code, "
+                     "or use --dry-run.")
+        if a.backend == "claude-code":
+            from agents.claude_code import cli_available
+            if not cli_available():
+                sys.exit("`claude` (Claude Code) is not on PATH. Install it and sign in, or use --backend api.")
 
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     run = a.run_dir or ROOT / "runs" / (stamp + ("-dry" if a.dry_run else "") + ("-baseline" if a.baseline_only else ""))
@@ -66,7 +79,7 @@ def main():
     problem = problem_markdown(a.ol_method, a.budget)
     (run / "D2_problem_statement.md").write_text(problem)
     transcript = run / "transcripts.jsonl"
-    config = {"started": stamp, "dry_run": a.dry_run, "budget": a.budget, "ol_method": a.ol_method,
+    config = {"started": stamp, "dry_run": a.dry_run, "backend": None if a.dry_run else a.backend, "budget": a.budget, "ol_method": a.ol_method,
               "planner_model": None if a.dry_run else os.environ.get("PLANNER_MODEL", "claude-opus-5-5"),
               "worker_model": None if a.dry_run else os.environ.get("WORKER_MODEL", "claude-sonnet-5-5")}
     (run / "config.json").write_text(json.dumps(config, indent=2))
@@ -189,6 +202,10 @@ def main():
                                  "output_tokens": u.output_tokens, "cache_read": u.cache_read,
                                  "cache_write": u.cache_write, "usd": round(u.cost, 4)}
         cost["total_usd"] = round(sum(v["usd"] for v in cost.values()), 4)
+        cost["backend"] = a.backend
+        if a.backend == "claude-code":
+            cost["note"] = ("usd is what Claude Code reports as the equivalent API cost; on a Claude subscription "
+                            "these calls count against plan usage instead of being billed")
     (run / "cost.json").write_text(json.dumps(cost, indent=2))
     shutil.copy(ROOT / "docs" / "architecture.mmd", run / "D1_architecture.mmd") if (ROOT / "docs" / "architecture.mmd").exists() else None
     b = R.best_feasible(records)

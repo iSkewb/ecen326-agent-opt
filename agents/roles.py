@@ -14,7 +14,7 @@ from pathlib import Path
 from sim.design import E12, E24, VARIABLES, Design, snap, validate
 from sim.specs import SPEC_TABLE, check, objective, ol_metrics
 
-from .llm import PLANNER_MODEL, WORKER_MODEL, AgentLLM, Tool
+from .llm import PLANNER_MODEL, WORKER_MODEL, Tool, make_agent
 
 PROMPTS = Path(__file__).parent / "prompts"
 
@@ -99,7 +99,7 @@ class Planner:
     """LLM planner: proposes x(k) through the propose_candidate tool; code validates it."""
 
     def __init__(self, problem_md: str, transcript: Path, simulated_keys: dict):
-        self.llm = AgentLLM("planner", PLANNER_MODEL,
+        self.llm = make_agent("planner", PLANNER_MODEL,
                             (PROMPTS / "planner.md").read_text() + "\n\n" + problem_md,
                             transcript, effort="high", max_tokens=32000)
         self.simulated = simulated_keys  # design_key -> k
@@ -260,7 +260,7 @@ class SimulationAgent:
     """LLM simulation agent. It can only run the simulator on the planner's exact x(k)."""
 
     def __init__(self, transcript: Path, simulate_fn):
-        self.llm = AgentLLM("simulation", WORKER_MODEL, (PROMPTS / "simulation.md").read_text(),
+        self.llm = make_agent("simulation", WORKER_MODEL, (PROMPTS / "simulation.md").read_text(),
                             transcript, effort="low", max_tokens=8000)
         self.simulate = simulate_fn
         self.errors: list[str] = []
@@ -357,7 +357,7 @@ _VERDICT_SCHEMA = {
 
 class Critic:
     def __init__(self, problem_md: str, transcript: Path):
-        self.llm = AgentLLM("critic", WORKER_MODEL, (PROMPTS / "critic.md").read_text() + "\n\n" + problem_md,
+        self.llm = make_agent("critic", WORKER_MODEL, (PROMPTS / "critic.md").read_text() + "\n\n" + problem_md,
                             transcript, effort="medium", max_tokens=16000)
 
     def review(self, k, d, y, chk, rationale, sim_report, records, method) -> dict:
@@ -416,7 +416,7 @@ class DryCritic:
 
 class Reporter:
     def __init__(self, transcript: Path):
-        self.llm = AgentLLM("reporter", WORKER_MODEL, (PROMPTS / "reporter.md").read_text(),
+        self.llm = make_agent("reporter", WORKER_MODEL, (PROMPTS / "reporter.md").read_text(),
                             transcript, effort="medium", max_tokens=16000)
 
     def write(self, make_deliverables, context: str, outdir: Path) -> str:
