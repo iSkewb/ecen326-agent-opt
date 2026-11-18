@@ -1,0 +1,41 @@
+{
+  "planner": {
+    "model": "claude-opus-5-5",
+    "calls": 21,
+    "input_tokens": 44,
+    "output_tokens": 197809,
+    "cache_read": 77765,
+    "cache_write": 107483,
+    "usd": 4.8318
+  },
+  "simulation": {
+    "model": "claude-sonnet-5-5",
+    "calls": 40,
+    "input_tokens": 100,
+    "output_tokens": 16922,
+    "cache_read": 65506,
+    "cache_write": 85227,
+    "usd": 0.5169
+  },
+  "critic": {
+    "model": "claude-sonnet-5-5",
+    "calls": 20,
+    "input_tokens": 40,
+    "output_tokens": 17206,
+    "cache_read": 61066,
+    "cache_write": 98360,
+    "usd": 0.5717
+  },
+  "reporter": {
+    "model": "claude-sonnet-5-5",
+    "calls": 2,
+    "input_tokens": 4,
+    "output_tokens": 2373,
+    "cache_read": 845,
+    "cache_write": 9385,
+    "usd": 0.0614
+  },
+  "total_usd": 5.9818,
+  "backend": "claude-code",
+  "note": "usd is what Claude Code reports as the equivalent API cost; on a Claude subscription these calls count against plan usage instead of being billed"
+}

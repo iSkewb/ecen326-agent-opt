@@ -1,0 +1,54 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * tran_hd: closed-loop inverting amplifier, 0.5 vpk 10 khz
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vcc1                                       4.9
+vcc2                                         5
+vg1                                    2.15747
+vo1                                    3.87922
+inn                                    2.51732
+vt                                    0.381711
+inp                                        2.5
+vt4                                   0.381711
+vg4                                    3.02469
+vodc                                   2.51732
+dq3                                        4.9
+xq3.d1                                 4.88168
+xq3.s1                                  1.2723
+vq1                                    1.25215
+vq2                                    2.09396
+xq1_1.d1                               2.52774
+xq1_1.s1                               4.99435
+dp1                                    2.51732
+xq2_1.d1                               2.51706
+xq2_1.s1                            0.00036471
+sn1                                          0
+vo                                           0
+src                                          0
+nin                                    2.51732
+vsig#branch                                  0
+vsn1#branch                          0.0260507
+vsp1#branch                          0.0260507
+vsq3#branch                          0.0183155
+vtail#branch                       0.000655278
+vcc2#branch                         -0.0260757
+vcc1#branch                         -0.0473337
+
+
+No. of Data Rows : 8021
+Note: Simulation executed from .control section 
+
+--- stderr ---
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed

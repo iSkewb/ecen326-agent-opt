@@ -1,0 +1,9 @@
+{
+  "started": "20261118-122730",
+  "dry_run": false,
+  "backend": "claude-code",
+  "budget": 20,
+  "ol_method": "follower",
+  "planner_model": "claude-opus-5-5",
+  "worker_model": "claude-sonnet-5-5"
+}

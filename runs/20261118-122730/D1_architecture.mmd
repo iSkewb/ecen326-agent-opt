@@ -1,0 +1,17 @@
+%% D1: multi-agent optimization flow (render with any Mermaid viewer, e.g. GitHub or mermaid.live)
+flowchart TD
+    P0["D2 problem statement<br/>objective, variables, constraints<br/>(sim/problem.py)"] --> PL
+    B["Hand design x(0)<br/>simulated once, not counted"] --> H
+    subgraph LOOP["Iteration k = 1 .. 20 (one simulator call each)"]
+        PL["Planner agent<br/>Claude Opus 5.5<br/>proposes x(k) via propose_candidate"] -->|"x(k) JSON"| V{"Code: range,<br/>E24/E12, duplicate?"}
+        V -->|"invalid: error back,<br/>up to 3 retries"| PL
+        V -->|valid| SA["Simulation agent<br/>Claude Sonnet 5.5<br/>run_simulation(x(k)) only"]
+        SA --> NG["ngspice-42 (sim/runner.py)<br/>OP, OL + CL AC, 0.5 Vpk HD tran,<br/>2 Vpk power tran + FFT"]
+        NG -->|"y(k) raw metrics"| SA
+        SA -->|"report_results<br/>(numbers checked vs raw)"| CK["Code spec check<br/>sim/specs.py<br/>pass/fail per constraint"]
+        CK --> CR["Critic agent<br/>Claude Sonnet 5.5<br/>ACCEPT / REVISE / REJECT + advice"]
+        CR -->|"code overrides ACCEPT on any FAIL;<br/>disagreements logged (D7)"| H["History: records.json<br/>D3 log, D4 plots"]
+        H --> PL
+    end
+    H -->|"budget spent"| RP["Reporting agent<br/>Claude Sonnet 5.5"]
+    RP --> OUT["D3 iteration log, D4 plots,<br/>D5 comparison, D6 final netlist + sims,<br/>D7 error log, SUMMARY.md"]

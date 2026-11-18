@@ -1,0 +1,40 @@
+* ac_fol: unity-gain follower (Multisim open-loop bench)
+.include "C:/Users/dbmey/GitHub/ecen326-agent-opt/models/cd4007.lib"
+.include "C:/Users/dbmey/GitHub/ecen326-agent-opt/models/power_fets.lib"
+.options reltol=1e-4 abstol=1e-10 vntol=1e-7 gmin=1e-12 itl1=500 itl2=500 itl4=200
+* ---- amplifier core ----
+VCC1 vcc1 0 DC 4.9
+VCC2 vcc2 0 DC 5
+* stage 1: CD4007 differential pair, PMOS mirror load (bodies: P to VCC1, N to ground)
+M1 vg1 vg1 vcc1 vcc1 CD4007P W=360u L=10u
+M2 vo1 vg1 vcc1 vcc1 CD4007P W=360u L=10u
+M3 vg1 inn vt 0 CD4007N W=170u L=10u
+M6 vo1 inp vt 0 CD4007N W=170u L=10u
+VTAIL vt vt4 DC 0
+M4 vt4 vg4 0 0 CD4007N W=170u L=10u
+R1 vcc1 vg4 3000
+R2 vg4 0 4700
+CC vo1 vodc 1.2e-11
+* buffer: 2N7000 source follower, class-AB gate bias network
+VSQ3 vcc1 dq3 DC 0
+XQ3 dq3 vo1 vq1 2N7000
+RK vq1 0 39
+RS vq2 vq1 51
+RUP vcc1 vq2 180
+* output stage: 1 x IRF9520 (high side) + 1 x IRLZ44N (low side)
+XQ1_1 dp1 vq1 vcc2 IRF9520
+VSP1 dp1 vodc DC 0
+XQ2_1 vodc vq2 sn1 IRLZ44N
+VSN1 sn1 0 DC 0
+C1 vodc vo 0.001
+RL vo 0 8
+VSIG inp 0 DC 2.5 AC 1
+RFOL vodc inn 1m
+.control
+set filetype=ascii
+set wr_singlescale
+set wr_vecnames
+ac dec 50 10 100Meg
+wrdata ac_fol.txt vr(vodc) vi(vodc) vr(inp) vi(inp) i(VSIG)
+.endc
+.end

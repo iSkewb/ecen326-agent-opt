@@ -1,0 +1,44 @@
+[12:27:30] k=0 simulating the hand design (baseline)
+[12:27:34] k=0 P_avg=0.7422 W, failed: ['f3db_ol', 'std_values', 'stability']
+[12:28:51] k=1 planner: {"vcc1": 5.0, "vcc2": 5.0, "r1": 5100.0, "r2": 10000.0, "rup": 150.0, "rs": 47.0, "rk": 47.0, "cc": 2.2e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:29:08] k=1 P_avg=0.6268 W  feasible=False  failed=['f3db_ol', 'stability']  critic=REJECT  best=none
+[12:30:24] k=2 planner: {"vcc1": 5.0, "vcc2": 5.0, "r1": 5100.0, "r2": 10000.0, "rup": 100.0, "rs": 30.0, "rk": 22.0, "cc": 2.2e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:30:39] k=2 P_avg=0.7221 W  feasible=False  failed=['av_ol']  critic=REVISE  best=none
+[12:32:19] k=3 planner: {"vcc1": 5.0, "vcc2": 5.0, "r1": 5100.0, "r2": 10000.0, "rup": 100.0, "rs": 30.0, "rk": 27.0, "cc": 1.8e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:32:39] k=3 P_avg=0.6690 W  feasible=False  failed=['f3db_ol']  critic=REVISE  best=none
+[12:34:02] k=4 planner: {"vcc1": 5.0, "vcc2": 5.0, "r1": 5100.0, "r2": 10000.0, "rup": 100.0, "rs": 30.0, "rk": 33.0, "cc": 1e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:34:22] k=4 P_avg=0.7062 W  feasible=False  failed=['f3db_ol', 'swing', 'stability']  critic=REJECT  best=none
+[12:35:19] k=5 planner: {"vcc1": 5.0, "vcc2": 5.0, "r1": 5100.0, "r2": 10000.0, "rup": 100.0, "rs": 30.0, "rk": 24.0, "cc": 1.8e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:35:37] k=5 P_avg=0.6993 W  feasible=False  failed=['av_ol']  critic=REVISE  best=none
+[12:36:23] k=6 planner: {"vcc1": 5.0, "vcc2": 5.0, "r1": 5600.0, "r2": 10000.0, "rup": 100.0, "rs": 30.0, "rk": 24.0, "cc": 1.5e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:36:43] k=6 P_avg=0.6989 W  feasible=True  failed=-  critic=REVISE  best=none
+[12:39:54] k=7 planner: {"vcc1": 4.95, "vcc2": 5.0, "r1": 5600.0, "r2": 10000.0, "rup": 100.0, "rs": 30.0, "rk": 27.0, "cc": 1.2e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:40:09] k=7 P_avg=0.6554 W  feasible=False  failed=['f3db_ol']  critic=REVISE  best=none
+[12:40:33] k=8 planner: {"vcc1": 4.95, "vcc2": 5.0, "r1": 5600.0, "r2": 10000.0, "rup": 100.0, "rs": 30.0, "rk": 27.0, "cc": 1e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:40:49] k=8 P_avg=0.6925 W  feasible=False  failed=['f3db_ol', 'stability']  critic=REJECT  best=none
+[12:41:52] k=9 planner: {"vcc1": 4.9, "vcc2": 5.0, "r1": 5600.0, "r2": 10000.0, "rup": 100.0, "rs": 30.0, "rk": 27.0, "cc": 1.2e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:42:07] k=9 P_avg=0.6443 W  feasible=False  failed=['av_ol']  critic=REVISE  best=none
+[12:42:47] k=10 planner: {"vcc1": 4.9, "vcc2": 5.0, "r1": 6200.0, "r2": 10000.0, "rup": 100.0, "rs": 30.0, "rk": 27.0, "cc": 1.2e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:43:10] k=10 P_avg=0.6438 W  feasible=True  failed=-  critic=REVISE  best=none
+[12:44:14] k=11 planner: {"vcc1": 4.9, "vcc2": 5.0, "r1": 6200.0, "r2": 10000.0, "rup": 120.0, "rs": 36.0, "rk": 30.0, "cc": 1.5e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:44:35] k=11 P_avg=0.6218 W  feasible=True  failed=-  critic=REVISE  best=none
+[12:48:43] k=12 planner: {"vcc1": 4.95, "vcc2": 5.0, "r1": 6800.0, "r2": 10000.0, "rup": 120.0, "rs": 36.0, "rk": 27.0, "cc": 1.5e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:48:57] k=12 P_avg=0.6555 W  feasible=False  failed=['f3db_ol']  critic=REVISE  best=none
+[12:49:20] k=13 planner: {"vcc1": 4.9, "vcc2": 5.0, "r1": 6200.0, "r2": 10000.0, "rup": 120.0, "rs": 36.0, "rk": 30.0, "cc": 1.2e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:49:42] k=13 P_avg=0.6218 W  feasible=True  failed=-  critic=ACCEPT  best=k=13 0.6218 W
+[12:51:45] k=14 planner: {"vcc1": 4.9, "vcc2": 5.0, "r1": 6200.0, "r2": 10000.0, "rup": 160.0, "rs": 47.0, "rk": 36.0, "cc": 1.2e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:52:05] k=14 P_avg=0.5815 W  feasible=True  failed=-  critic=ACCEPT  best=k=14 0.5815 W
+[12:52:30] k=15 planner: {"vcc1": 4.9, "vcc2": 5.0, "r1": 6200.0, "r2": 10000.0, "rup": 180.0, "rs": 51.0, "rk": 39.0, "cc": 1.2e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:52:43] k=15 P_avg=0.5642 W  feasible=False  failed=['av_ol']  critic=REJECT  best=k=14 0.5815 W
+[12:53:52] k=16 planner: {"vcc1": 4.9, "vcc2": 5.0, "r1": 6200.0, "r2": 10000.0, "rup": 180.0, "rs": 51.0, "rk": 43.0, "cc": 1.2e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:54:06] k=16 P_avg=0.5487 W  feasible=False  failed=['f3db_ol']  critic=REJECT  best=k=14 0.5815 W
+[12:55:22] k=17 planner: {"vcc1": 4.9, "vcc2": 5.0, "r1": 6200.0, "r2": 10000.0, "rup": 200.0, "rs": 56.0, "rk": 43.0, "cc": 1.2e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:55:39] k=17 P_avg=0.5491 W  feasible=False  failed=['f3db_ol']  critic=REVISE  best=k=14 0.5815 W
+[12:57:31] k=18 planner: {"vcc1": 4.9, "vcc2": 5.0, "r1": 3000.0, "r2": 4700.0, "rup": 180.0, "rs": 51.0, "rk": 39.0, "cc": 1.2e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[12:57:48] k=18 P_avg=0.5658 W  feasible=True  failed=-  critic=ACCEPT  best=k=18 0.5658 W
+[13:01:46] k=19 planner: {"vcc1": 4.9, "vcc2": 5.0, "r1": 10000.0, "r2": 15000.0, "rup": 180.0, "rs": 47.0, "rk": 39.0, "cc": 1.2e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[13:02:04] k=19 P_avg=0.5670 W  feasible=False  failed=['f3db_ol']  critic=REJECT  best=k=18 0.5658 W
+[13:07:04] k=20 planner: {"vcc1": 4.9, "vcc2": 4.95, "r1": 4300.0, "r2": 6800.0, "rup": 180.0, "rs": 51.0, "rk": 39.0, "cc": 1.2e-11, "rin": 220000.0, "rf": 910000.0, "n_out": 1}
+[13:07:18] k=20 P_avg=0.5552 W  feasible=False  failed=['f3db_ol']  critic=REJECT  best=k=18 0.5658 W
+[13:07:18] reporting
+[13:07:41] done. best feasible: k=18, 0.5658 W; API cost $5.98; outputs in C:\Users\dbmey\GitHub\ecen326-agent-opt\runs\20261118-122730
