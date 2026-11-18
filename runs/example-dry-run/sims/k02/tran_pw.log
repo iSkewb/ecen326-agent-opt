@@ -1,0 +1,54 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * tran_pw: closed-loop inverting amplifier, 0.499995 vpk 10 khz
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vcc1                                         5
+vcc2                                         5
+vg1                                    2.20959
+vo1                                    3.49128
+inn                                    2.51228
+vt                                    0.344786
+inp                                        2.5
+vt4                                   0.344786
+vg4                                    3.31126
+vodc                                   2.51228
+dq3                                          5
+xq3.d1                                  4.9957
+xq3.s1                                 1.20735
+vq1                                    1.20262
+vq2                                    2.10859
+xq1_1.d1                               2.53614
+xq1_1.s1                               4.98706
+dp1                                    2.51228
+xq2_1.d1                               2.51169
+xq2_1.s1                           0.000834939
+sn1                                          0
+vo                                           0
+src                                          0
+nin                                    2.51228
+vsig#branch                                  0
+vsn1#branch                          0.0596385
+vsp1#branch                          0.0596385
+vsq3#branch                         0.00430463
+vtail#branch                       0.000717384
+vcc2#branch                         -0.0596635
+vcc1#branch                         -0.0246292
+
+ Reference value :  1.34901e-03
+No. of Data Rows : 26911
+Note: Simulation executed from .control section 
+
+--- stderr ---
+Using SPARSE 1.3 as Direct Linear Solver
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed

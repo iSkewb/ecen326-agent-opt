@@ -1,0 +1,70 @@
+{
+  "feasible": false,
+  "failed": [
+    "f3db_ol",
+    "std_values",
+    "stability"
+  ],
+  "checks": {
+    "av_ol": {
+      "value": 66.66431699049453,
+      "limit": ">= 25",
+      "detail": "method=follower; loop-break |Av|=1293.9",
+      "pass": true
+    },
+    "rin": {
+      "value": 220713.85130237424,
+      "limit": ">= 200e3",
+      "detail": "open-loop |Zin| min 100 Hz-200 kHz=6.249e+05, closed-loop Rin @10 kHz=2.207e+05",
+      "pass": true
+    },
+    "f3db_ol": {
+      "value": 136626.76221285312,
+      "limit": "> 200e3",
+      "detail": "method=follower; loop-break f3dB=8064 Hz",
+      "pass": false
+    },
+    "hd": {
+      "value": -35.85480927451972,
+      "limit": "< -30 dB",
+      "detail": "THD=2.3% (-32.8 dB), beta=0.188, Vout fundamental=2.107 Vpk",
+      "pass": true
+    },
+    "swing": {
+      "value": 2.109973348964133,
+      "limit": ">= 1.95 Vpk each side, fund >= 1.98",
+      "detail": "fundamental=2.005 Vpk, +peak=2.110, -peak=2.511, worst harmonic=-35.7 dBc",
+      "pass": true
+    },
+    "vcc": {
+      "value": 5.0,
+      "limit": "<= 5",
+      "detail": "VCC1=5.0 V, VCC2=5.0 V",
+      "pass": true
+    },
+    "std_values": {
+      "value": 2,
+      "limit": "0 violations",
+      "detail": "r1=5000 ohm is not an E24 standard value (nearest: 5100); rf=950000 ohm is not an E24 standard value (nearest: 910000)",
+      "pass": false
+    },
+    "ratings": {
+      "value": 0,
+      "limit": "0 violations",
+      "detail": "ok",
+      "pass": true
+    },
+    "stability": {
+      "value": -5.34025744078391,
+      "limit": "< -30 dB",
+      "detail": "non-harmonic content at 2 Vpk=-5.3 dB; loop-break phase margin=17.5 deg; closed-loop peaking=9.1 dB",
+      "pass": false
+    },
+    "converged": {
+      "value": true,
+      "limit": "true",
+      "detail": "ok",
+      "pass": true
+    }
+  }
+}

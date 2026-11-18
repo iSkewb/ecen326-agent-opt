@@ -1,0 +1,52 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * tran_pw: closed-loop inverting amplifier, 0.495866 vpk 10 khz
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vcc1                                       4.8
+vcc2                                         5
+vg1                                    2.04828
+vo1                                    3.74902
+inn                                    2.51651
+vt                                    0.374086
+inp                                        2.5
+vt4                                   0.374086
+vg4                                    3.07692
+vodc                                   2.51651
+dq3                                        4.8
+xq3.d1                                 4.78962
+xq3.s1                                 1.29711
+vq1                                    1.28569
+vq2                                    2.08363
+xq1_1.d1                               2.52069
+xq1_1.s1                               4.99773
+dp1                                    2.51651
+xq2_1.d1                                2.5164
+xq2_1.s1                           0.000146312
+sn1                                          0
+vo                                           0
+src                                          0
+nin                                    2.51651
+vsig#branch                                  0
+vsn1#branch                          0.0104509
+vsp1#branch                          0.0104509
+vsq3#branch                          0.0103778
+vtail#branch                       0.000667209
+vcc2#branch                         -0.0104759
+vcc1#branch                           -0.02833
+
+
+No. of Data Rows : 8419
+Note: Simulation executed from .control section 
+
+--- stderr ---
+Using SPARSE 1.3 as Direct Linear Solver

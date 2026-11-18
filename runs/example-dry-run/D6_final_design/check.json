@@ -1,0 +1,66 @@
+{
+  "feasible": true,
+  "failed": [],
+  "checks": {
+    "av_ol": {
+      "value": 26.15199068307,
+      "limit": ">= 25",
+      "detail": "method=follower; loop-break |Av|=119.9",
+      "pass": true
+    },
+    "rin": {
+      "value": 227872.34981661686,
+      "limit": ">= 200e3",
+      "detail": "open-loop |Zin| min 100 Hz-200 kHz=6.118e+05, closed-loop Rin @10 kHz=2.279e+05",
+      "pass": true
+    },
+    "f3db_ol": {
+      "value": 208960.69251691908,
+      "limit": "> 200e3",
+      "detail": "method=follower; loop-break f3dB=6.002e+04 Hz",
+      "pass": true
+    },
+    "hd": {
+      "value": -44.05525703927917,
+      "limit": "< -30 dB",
+      "detail": "THD=0.65% (-43.7 dB), beta=0.195, Vout fundamental=2.009 Vpk",
+      "pass": true
+    },
+    "swing": {
+      "value": 1.992692036449105,
+      "limit": ">= 1.95 Vpk each side, fund >= 1.98",
+      "detail": "fundamental=2.000 Vpk, +peak=2.015, -peak=1.993, worst harmonic=-44.1 dBc",
+      "pass": true
+    },
+    "vcc": {
+      "value": 5.0,
+      "limit": "<= 5",
+      "detail": "VCC1=4.8 V, VCC2=5.0 V",
+      "pass": true
+    },
+    "std_values": {
+      "value": 0,
+      "limit": "0 violations",
+      "detail": "ok",
+      "pass": true
+    },
+    "ratings": {
+      "value": 0,
+      "limit": "0 violations",
+      "detail": "ok",
+      "pass": true
+    },
+    "stability": {
+      "value": -53.38588114074913,
+      "limit": "< -30 dB",
+      "detail": "non-harmonic content at 2 Vpk=-53.4 dB; loop-break phase margin=18.1 deg; closed-loop peaking=24.0 dB",
+      "pass": true
+    },
+    "converged": {
+      "value": true,
+      "limit": "true",
+      "detail": "ok",
+      "pass": true
+    }
+  }
+}

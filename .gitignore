@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+# raw waveform data is large; netlists, logs and metrics.json are kept
+runs/**/*.txt
+!runs/**/*_fourier.txt
+!runs/**/op_cl*.txt
+runs/test-*/

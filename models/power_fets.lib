@@ -1,0 +1,43 @@
+* Discrete MOSFET models for the buffer and class-AB output stage.
+* Built as level-1 subcircuits from the parameters the Multisim models report
+* (preliminary report, "Values Extracted From Datasheet / Multisim" table):
+*   IRF9520  Vth 3.66 V  K 6.26 A/V^2  lambda 0.094  RS 0.22 ohm  Cgs 0.37 nF Cgd 0.73 nF
+*   IRLZ44N  Vth 2.09 V  K 67.9 A/V^2  ro ~8 kohm @40 mA  RS 0.014   Cgs 1.55 nF Cgd 0.91 nF
+*   2N7000   Vth 2.24 V  K 93.2 mA/V^2 lambda 0       RS 1.1     Ciss ~60 pF
+* With W=L=100u, KP is the device K (ID = K/2 * Vov^2).
+*
+* CALIBRATION (documented in docs/baseline_validation.md):
+*   With the report's Vth values the ngspice operating point drew 42.7 mA in the output
+*   stage instead of Multisim's 59.6 mA, and Vo1 sat 0.30 V high. Back-solving the
+*   Multisim DC operating point (Fig. 7 of the preliminary report) through the same
+*   square law gives Vth = 2.066 V for the IRLZ44N and 1.98 V for the 2N7000, so those
+*   two VTO values are set to match the team's Multisim baseline. Everything else is as
+*   listed above.
+* Vendor PSpice libraries (Vishay SiHF9520, Infineon IRLZ44N, onsemi 2N7000) can be dropped
+* in instead: keep the subcircuit names and pin order (D G S).
+* Body diode included for the power devices. Pin order: D G S.
+
+.subckt IRF9520 D G S
+M1 D1 G S1 S1 MIRF9520 W=100u L=100u
+RS S S1 0.217
+RD D D1 0.4
+DB D S DBP
+.model MIRF9520 PMOS (LEVEL=1 VTO=-3.66 KP=6.26 LAMBDA=0.094 CGSO=3.7e-6 CGDO=7.3e-6)
+.model DBP D (IS=1.2e-8 N=1.5 RS=0.026 BV=100 CJO=4e-10)
+.ends IRF9520
+
+.subckt IRLZ44N D G S
+M1 D1 G S1 S1 MIRLZ44N W=100u L=100u
+RS S S1 0.014
+RD D D1 0.01
+DB S D DBN
+.model MIRLZ44N NMOS (LEVEL=1 VTO=2.066 KP=67.9 LAMBDA=0.003 CGSO=1.55e-5 CGDO=9.1e-6)
+.model DBN D (IS=1e-9 N=1.2 RS=0.005 BV=55 CJO=1.2e-9)
+.ends IRLZ44N
+
+.subckt 2N7000 D G S
+M1 D1 G S1 S1 M2N7000 W=100u L=100u
+RS S S1 1.1
+RD D D1 1.0
+.model M2N7000 NMOS (LEVEL=1 VTO=1.98 KP=0.0932 LAMBDA=0 CGSO=5e-7 CGDO=1e-7)
+.ends 2N7000

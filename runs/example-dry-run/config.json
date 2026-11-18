@@ -1,0 +1,8 @@
+{
+  "started": "20261118-161541",
+  "dry_run": true,
+  "budget": 20,
+  "ol_method": "follower",
+  "planner_model": null,
+  "worker_model": null
+}

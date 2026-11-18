@@ -1,0 +1,54 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * tran_hd: closed-loop inverting amplifier, 0.5 vpk 10 khz
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vcc1                                         5
+vcc2                                         5
+vg1                                    2.20541
+vo1                                    3.55758
+inn                                      2.513
+vt                                    0.342663
+inp                                        2.5
+vt4                                   0.342663
+vg4                                    3.33333
+vodc                                     2.513
+dq3                                          5
+xq3.d1                                 4.99369
+xq3.s1                                 1.20956
+vq1                                    1.20261
+vq2                                    2.10859
+xq1_1.d1                               2.53685
+xq1_1.s1                               4.98706
+dp1                                      2.513
+xq2_1.d1                                2.5124
+xq2_1.s1                           0.000834912
+sn1                                          0
+vo                                           0
+src                                          0
+nin                                      2.513
+vsig#branch                                  0
+vsn1#branch                          0.0596366
+vsp1#branch                          0.0596366
+vsq3#branch                         0.00631147
+vtail#branch                       0.000722428
+vcc2#branch                         -0.0596616
+vcc1#branch                         -0.0266433
+
+ Reference value :  1.01488e-03
+No. of Data Rows : 27005
+Note: Simulation executed from .control section 
+
+--- stderr ---
+Using SPARSE 1.3 as Direct Linear Solver
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed

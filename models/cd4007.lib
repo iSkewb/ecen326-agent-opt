@@ -1,0 +1,12 @@
+* CD4007 discrete MOSFETs (one N and one P device of the CD4007UB array)
+* Level-1 models. KP, VTO, LAMBDA and W/L are the values in the team's
+* device-characterization notes (kn'=70uA/V^2, Vtn=1.4 V, W/L=170u/10u, lambda=0.016;
+* kp'=15uA/V^2, Vtp=-1.65 V, W/L=360u/10u, lambda=0.01). These reproduce the
+* Multisim operating point (I_tail 701 uA, VG1 2.21 V) to within a few percent.
+* Capacitances are estimates sized so the open-loop input |Z| at 200 kHz is near the
+* ~1.6 pF the Multisim run implies (491.6 kOhm at 200 kHz); they are NOT vendor data.
+* Use: M<name> d g s b CD4007N W=170u L=10u   /  CD4007P W=360u L=10u
+.model CD4007N NMOS (LEVEL=1 VTO=1.4 KP=70u LAMBDA=0.016 GAMMA=0 PHI=0.6
++ TOX=1e-7 CGSO=4e-9 CGDO=4e-9 CBD=2p CBS=2p)
+.model CD4007P PMOS (LEVEL=1 VTO=-1.65 KP=15u LAMBDA=0.01 GAMMA=0 PHI=0.6
++ TOX=1e-7 CGSO=4e-9 CGDO=4e-9 CBD=2p CBS=2p)
