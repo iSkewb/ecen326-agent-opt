@@ -70,8 +70,8 @@ def amplifier_core(d: Design) -> str:
 
 def _header(title: str) -> str:
     return (f"* {title}\n"
-            f".include {MODELS / 'cd4007.lib'}\n"
-            f".include {MODELS / 'power_fets.lib'}\n"
+            f'.include "{(MODELS / "cd4007.lib").as_posix()}"\n'
+            f'.include "{(MODELS / "power_fets.lib").as_posix()}"\n'
             ".options reltol=1e-4 abstol=1e-10 vntol=1e-7 gmin=1e-12 itl1=500 itl2=500 itl4=200\n")
 
 
@@ -93,7 +93,7 @@ def _save_vectors(d: Design) -> str:
 
 def _op_block(d: Design, outdir: Path, name: str) -> str:
     return (f"op\n"
-            f"print all > {outdir / (name + '_op.txt')}\n")
+            f"print all > {name}_op.txt\n")
 
 
 def deck_op_cl(d: Design, outdir: Path) -> str:
@@ -102,8 +102,8 @@ def deck_op_cl(d: Design, outdir: Path) -> str:
             + "VSIG src 0 DC 0\n" + _cl_feedback(d, "src")
             + ".control\nset filetype=ascii\nset wr_singlescale\nset wr_vecnames\n"
             + "op\n"
-            + f"print all > {outdir / 'op_cl.txt'}\n"
-            + f"print {_save_vectors(d)} > {outdir / 'op_cl_currents.txt'}\n"
+            + f"print all > op_cl.txt\n"
+            + f"print {_save_vectors(d)} > op_cl_currents.txt\n"
             + ".endc\n.end\n")
 
 
@@ -115,7 +115,7 @@ def deck_ac_ol(d: Design, outdir: Path) -> str:
             + "LFB vodc inn 1e9\nCFB inn 0 1\n"
             + ".control\nset filetype=ascii\nset wr_singlescale\nset wr_vecnames\n"
             + "ac dec 50 10 100Meg\n"
-            + f"wrdata {outdir / 'ac_ol.txt'} vr(vodc) vi(vodc) vr(vo) vi(vo)\n"
+            + f"wrdata ac_ol.txt vr(vodc) vi(vodc) vr(vo) vi(vo)\n"
             + ".endc\n.end\n")
 
 
@@ -127,7 +127,7 @@ def deck_ac_fol(d: Design, outdir: Path) -> str:
             + "RFOL vodc inn 1m\n"
             + ".control\nset filetype=ascii\nset wr_singlescale\nset wr_vecnames\n"
             + "ac dec 50 10 100Meg\n"
-            + f"wrdata {outdir / 'ac_fol.txt'} vr(vodc) vi(vodc) vr(inp) vi(inp) i(VSIG)\n"
+            + f"wrdata ac_fol.txt vr(vodc) vi(vodc) vr(inp) vi(inp) i(VSIG)\n"
             + ".endc\n.end\n")
 
 
@@ -137,7 +137,7 @@ def deck_ac_cl(d: Design, outdir: Path) -> str:
             + "VSIG src 0 DC 0 AC 1\n" + _cl_feedback(d, "src")
             + ".control\nset filetype=ascii\nset wr_singlescale\nset wr_vecnames\n"
             + "ac dec 50 10 100Meg\n"
-            + f"wrdata {outdir / 'ac_cl.txt'} vr(vo) vi(vo) vr(vodc) vi(vodc) i(VSIG)\n"
+            + f"wrdata ac_cl.txt vr(vo) vi(vo) vr(vodc) vi(vodc) i(VSIG)\n"
             + ".endc\n.end\n")
 
 
@@ -151,9 +151,9 @@ def deck_tran_cl(d: Design, outdir: Path, name: str, vin_pk: float,
             + ".control\nset filetype=ascii\nset wr_singlescale\nset wr_vecnames\n"
             + f"tran {tstep:.4g} {tstop:.4g} 0 {tstep:.4g}\n"
             + "linearize\n"
-            + f"wrdata {outdir / (name + '.txt')} v(vo) v(vodc) v(src) v(vcc1) v(vcc2) v(vq1) "
+            + f"wrdata {name}.txt v(vo) v(vodc) v(src) v(vcc1) v(vcc2) v(vq1) "
               f"v(vo1) {_save_vectors(d)}\n"
-            + (f"fourier {F_SIG:g} v(vo) > {outdir / (name + '_fourier.txt')}\n" if fourier else "")
+            + (f"fourier {F_SIG:g} v(vo) > {name}_fourier.txt\n" if fourier else "")
             + ".endc\n.end\n")
 
 
@@ -167,6 +167,6 @@ def deck_tran_ol(d: Design, outdir: Path, vin_pk: float = 5e-3, cycles: int = 20
             + "LFB vodc inn 1e9\nCFB inn 0 1\n"
             + ".control\nset filetype=ascii\nset wr_singlescale\nset wr_vecnames\n"
             + f"tran {tstep:.4g} {tstop:.4g} 0 {tstep:.4g}\nlinearize\n"
-            + f"wrdata {outdir / 'tran_ol.txt'} v(vo) v(vodc) v(inp)\n"
-            + f"fourier {F_SIG:g} v(vo) > {outdir / 'tran_ol_fourier.txt'}\n"
+            + f"wrdata tran_ol.txt v(vo) v(vodc) v(inp)\n"
+            + f"fourier {F_SIG:g} v(vo) > tran_ol_fourier.txt\n"
             + ".endc\n.end\n")

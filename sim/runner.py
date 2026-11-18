@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import shutil
 import subprocess
 import time
@@ -20,7 +21,44 @@ import numpy as np
 from . import netlist as N
 from .design import Design, FIXED
 
-NGSPICE = shutil.which("ngspice") or "ngspice"
+class NgspiceNotFound(RuntimeError):
+    pass
+
+
+def find_ngspice() -> str:
+    """Locate the ngspice batch executable.
+
+    Order: the NGSPICE environment variable, `ngspice_con` on PATH (the Windows console
+    build), `ngspice` on PATH, then the default Windows install folders.
+    """
+    env = os.environ.get("NGSPICE")
+    if env:
+        if Path(env).is_file() or shutil.which(env):
+            return shutil.which(env) or env
+        raise NgspiceNotFound(f"NGSPICE is set to {env!r}, but no such file exists.")
+    for name in ("ngspice_con", "ngspice"):
+        hit = shutil.which(name)
+        if hit:
+            return hit
+    for cand in (r"C:\Spice64\bin\ngspice_con.exe", r"C:\Spice\bin\ngspice_con.exe",
+                 r"C:\Program Files\Spice64\bin\ngspice_con.exe"):
+        if Path(cand).is_file():
+            return cand
+    raise NgspiceNotFound(
+        "ngspice was not found. Install it (Linux: sudo apt install ngspice; macOS: brew install ngspice; "
+        "Windows: extract the ngspice-4x_64.7z release to C:\\Spice64 so that C:\\Spice64\\bin\\ngspice_con.exe exists), "
+        "or point the NGSPICE environment variable at the executable "
+        "(PowerShell: $env:NGSPICE = \"C:\\path\\to\\ngspice_con.exe\").")
+
+
+_NGSPICE: str | None = None
+
+
+def ngspice() -> str:
+    global _NGSPICE
+    if _NGSPICE is None:
+        _NGSPICE = find_ngspice()
+    return _NGSPICE
 TARGET_SWING = 2.0          # V peak at the 8 ohm load
 HD_INPUT_PK = 0.5           # V peak (1 Vpp) for the distortion spec
 N_CYCLES_FFT = 10           # analyse the last 10 cycles of each transient
@@ -33,14 +71,17 @@ class SimError(RuntimeError):
 # ------------------------------------------------------------------ running
 
 def _run_deck(text: str, path: Path, timeout: int = 240) -> str:
-    path.write_text(text)
+    path.write_text(text, encoding="utf-8")
     log = path.with_suffix(".log")
     t0 = time.time()
     try:
-        p = subprocess.run([NGSPICE, "-b", str(path)], capture_output=True, text=True, timeout=timeout)
+        # run in the deck's own folder: the decks write their output files by bare name, which
+        # avoids drive letters, backslashes and spaces in paths inside the netlist
+        p = subprocess.run([ngspice(), "-b", path.name], capture_output=True, text=True, timeout=timeout,
+                           cwd=path.parent, encoding="utf-8", errors="replace")
     except subprocess.TimeoutExpired as e:
         raise SimError(f"{path.name}: ngspice timed out after {timeout}s") from e
-    log.write_text(p.stdout + "\n--- stderr ---\n" + p.stderr)
+    log.write_text(p.stdout + "\n--- stderr ---\n" + p.stderr, encoding="utf-8")
     out = p.stdout + p.stderr
     bad = [ln for ln in out.splitlines()
            if any(s in ln.lower() for s in ("singular matrix", "timestep too small", "no convergence",
@@ -59,7 +100,7 @@ def _load(path: Path) -> np.ndarray:
 
 def _parse_op(path: Path) -> dict:
     vals = {}
-    for ln in path.read_text().splitlines():
+    for ln in path.read_text(encoding="utf-8", errors="replace").splitlines():
         if "=" in ln:
             k, v = ln.split("=", 1)
             try:
@@ -259,6 +300,7 @@ def simulate(d: Design, outdir: Path, full: bool = False) -> dict:
     full=True also runs the open-loop 5 mV transient and ngspice's own Fourier analysis
     (the extra plots the report needs for the hand design and the final design).
     """
+    ngspice()  # fail fast with a clear message if ngspice is not installed
     outdir = Path(outdir)
     outdir.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
@@ -313,5 +355,5 @@ def simulate(d: Design, outdir: Path, full: bool = False) -> dict:
     y["beta"] = d.beta
     y["sim_seconds"] = round(time.time() - t0, 2)
     y = {k: (float(v) if isinstance(v, (np.floating,)) else v) for k, v in y.items()}
-    (outdir / "metrics.json").write_text(json.dumps(y, indent=2, default=str))
+    (outdir / "metrics.json").write_text(json.dumps(y, indent=2, default=str), encoding="utf-8")
     return y

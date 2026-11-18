@@ -26,13 +26,12 @@ from .llm import Tool, Usage
 
 TIMEOUT_S = int(os.environ.get("CLAUDE_CODE_TIMEOUT", "900"))
 
+# Kept free of spaces and descriptions on purpose: it is passed on the command line, and on
+# Windows `claude` is often claude.cmd, whose cmd.exe shim mangles quoted arguments with spaces.
+# The prompt itself explains the fields.
 _REPLY_SCHEMA = {
     "type": "object",
-    "properties": {
-        "tool": {"type": "string", "description": "name of the ONE tool to call now, or \"finish\""},
-        "input": {"type": "object", "description": "the tool's input, matching its input schema"},
-        "note": {"type": "string", "description": "optional short remark (logged)"},
-    },
+    "properties": {"tool": {"type": "string"}, "input": {"type": "object"}, "note": {"type": "string"}},
     "required": ["tool", "input"],
 }
 
@@ -54,10 +53,14 @@ class ClaudeCodeLLM:
         self.effort, self.max_tokens = effort, max_tokens
         self.transcript = transcript
         self.usage = Usage()
-        self.workdir = Path(tempfile.mkdtemp(prefix=f"agent-{role}-"))  # empty: nothing to read
+        self.workdir = Path(tempfile.mkdtemp(prefix=f"agent-{role}-"))  # empty but for the prompt file
+        # The system prompt goes through a file, not the command line: on Windows the command line is
+        # limited to ~8k characters and cmd.exe treats | < > & ^ % in it as syntax.
+        self.system_file = self.workdir / "system_prompt.md"
+        self.system_file.write_text(system, encoding="utf-8")
 
     def _log(self, kind: str, payload) -> None:
-        with self.transcript.open("a") as f:
+        with self.transcript.open("a", encoding="utf-8") as f:
             f.write(json.dumps({"t": time.time(), "role": self.role, "model": self.model, "backend": "claude-code",
                                 "kind": kind, "data": payload}, default=str) + "\n")
 
@@ -65,15 +68,15 @@ class ClaudeCodeLLM:
         schema = json.loads(json.dumps(_REPLY_SCHEMA))
         schema["properties"]["tool"]["enum"] = tool_names + ["finish"]
         cmd = [self.cli, "-p", "--model", self.model, "--effort", self.effort,
-               "--system-prompt", self.system,
+               "--system-prompt-file", str(self.system_file),
                "--tools", "", "--strict-mcp-config", "--setting-sources", "", "--disable-slash-commands",
                "--permission-mode", "dontAsk", "--no-session-persistence",
-               "--output-format", "json", "--json-schema", json.dumps(schema)]
+               "--output-format", "json", "--json-schema", json.dumps(schema, separators=(",", ":"))]
         last_err = ""
         for attempt in range(3):
             try:
-                p = subprocess.run(cmd, input=prompt, capture_output=True, text=True,
-                                   timeout=TIMEOUT_S, cwd=self.workdir)
+                p = subprocess.run(cmd, input=prompt, capture_output=True, text=True, encoding="utf-8",
+                                   errors="replace", timeout=TIMEOUT_S, cwd=self.workdir)
                 out = json.loads(p.stdout)
             except subprocess.TimeoutExpired:
                 last_err = f"timed out after {TIMEOUT_S} s"

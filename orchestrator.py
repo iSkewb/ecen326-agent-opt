@@ -35,7 +35,7 @@ from report import reporting as R  # noqa: E402
 def load_env():
     p = ROOT / ".env"
     if p.exists():
-        for line in p.read_text().splitlines():
+        for line in p.read_text(encoding="utf-8").splitlines():
             line = line.strip()
             if line and not line.startswith("#") and "=" in line:
                 k, v = line.split("=", 1)
@@ -43,7 +43,7 @@ def load_env():
 
 
 def save(records, run):
-    (run / "records.json").write_text(json.dumps(records, indent=1, default=str))
+    (run / "records.json").write_text(encoding="utf-8", data=json.dumps(records, indent=1, default=str))
 
 
 def main():
@@ -62,6 +62,11 @@ def main():
     a = ap.parse_args()
     load_env()
 
+    from sim.runner import NgspiceNotFound, ngspice
+    try:
+        ngspice()
+    except NgspiceNotFound as e:
+        sys.exit(str(e))
     a.backend = a.backend or os.environ.get("LLM_BACKEND", "api")
     os.environ["LLM_BACKEND"] = a.backend
     if not a.dry_run and not a.baseline_only:
@@ -77,13 +82,13 @@ def main():
     run = a.run_dir or ROOT / "runs" / (stamp + ("-dry" if a.dry_run else "") + ("-baseline" if a.baseline_only else ""))
     run.mkdir(parents=True, exist_ok=True)
     problem = problem_markdown(a.ol_method, a.budget)
-    (run / "D2_problem_statement.md").write_text(problem)
+    (run / "D2_problem_statement.md").write_text(encoding="utf-8", data=problem)
     transcript = run / "transcripts.jsonl"
     config = {"started": stamp, "dry_run": a.dry_run, "backend": None if a.dry_run else a.backend, "budget": a.budget, "ol_method": a.ol_method,
               "planner_model": None if a.dry_run else os.environ.get("PLANNER_MODEL", "claude-opus-5-5"),
               "worker_model": None if a.dry_run else os.environ.get("WORKER_MODEL", "claude-sonnet-5-5")}
-    (run / "config.json").write_text(json.dumps(config, indent=2))
-    log = (run / "run.log").open("a")
+    (run / "config.json").write_text(encoding="utf-8", data=json.dumps(config, indent=2))
+    log = (run / "run.log").open("a", encoding="utf-8")
 
     def say(s):
         line = f"[{datetime.now():%H:%M:%S}] {s}"
@@ -162,7 +167,7 @@ def main():
             dis.append(f"k={r['k']} simulation agent: {x}")
     if planner is not None:
         dis += [f"planner: {e}" for e in planner.errors] + [f"simulation agent: {e}" for e in sim_agent.errors]
-    (run / "D7_agent_errors.md").write_text("# Agent errors and critic/code disagreements\n\n" +
+    (run / "D7_agent_errors.md").write_text(encoding="utf-8", data="# Agent errors and critic/code disagreements\n\n" +
                                             ("\n".join(f"- {x}" for x in dis) if dis else "None logged.") + "\n")
 
     def deliverables():
@@ -177,11 +182,11 @@ def main():
         b = R.best_feasible(records)
         return (f"Wrote {p[0].name}, {p[1].name}, D4_convergence.png, D4_constraints.png, {cmp_.name}, "
                 f"{'D6_final_design/ (k=%d)' % b['k'] if d6 else 'no D6 (no feasible design)'}.\n\n"
-                + cmp_.read_text())
+                + cmp_.read_text(encoding="utf-8"))
 
     ctx = (f"Run directory: {run.name}. Budget {a.budget}, simulated {len(records) - 1} candidates, "
            f"open-loop method {a.ol_method}.\n\nAgent error / disagreement log:\n" +
-           ((run / "D7_agent_errors.md").read_text()) + "\n\nHistory:\n" + roles.history_table(records, a.ol_method))
+           ((run / "D7_agent_errors.md").read_text(encoding="utf-8")) + "\n\nHistory:\n" + roles.history_table(records, a.ol_method))
     say("reporting")
     if a.dry_run or a.baseline_only:
         roles.DryReporter().write(deliverables, ctx, run)
@@ -206,7 +211,7 @@ def main():
         if a.backend == "claude-code":
             cost["note"] = ("usd is what Claude Code reports as the equivalent API cost; on a Claude subscription "
                             "these calls count against plan usage instead of being billed")
-    (run / "cost.json").write_text(json.dumps(cost, indent=2))
+    (run / "cost.json").write_text(encoding="utf-8", data=json.dumps(cost, indent=2))
     shutil.copy(ROOT / "docs" / "architecture.mmd", run / "D1_architecture.mmd") if (ROOT / "docs" / "architecture.mmd").exists() else None
     b = R.best_feasible(records)
     say(f"done. best feasible: {('k=%d, %.4f W' % (b['k'], objective(b['metrics']))) if b else 'none'}; "

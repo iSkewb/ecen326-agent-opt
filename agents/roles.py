@@ -100,7 +100,7 @@ class Planner:
 
     def __init__(self, problem_md: str, transcript: Path, simulated_keys: dict):
         self.llm = make_agent("planner", PLANNER_MODEL,
-                            (PROMPTS / "planner.md").read_text() + "\n\n" + problem_md,
+                            (PROMPTS / "planner.md").read_text(encoding="utf-8") + "\n\n" + problem_md,
                             transcript, effort="high", max_tokens=32000)
         self.simulated = simulated_keys  # design_key -> k
         self.errors: list[str] = []
@@ -260,7 +260,7 @@ class SimulationAgent:
     """LLM simulation agent. It can only run the simulator on the planner's exact x(k)."""
 
     def __init__(self, transcript: Path, simulate_fn):
-        self.llm = make_agent("simulation", WORKER_MODEL, (PROMPTS / "simulation.md").read_text(),
+        self.llm = make_agent("simulation", WORKER_MODEL, (PROMPTS / "simulation.md").read_text(encoding="utf-8"),
                             transcript, effort="low", max_tokens=8000)
         self.simulate = simulate_fn
         self.errors: list[str] = []
@@ -357,7 +357,7 @@ _VERDICT_SCHEMA = {
 
 class Critic:
     def __init__(self, problem_md: str, transcript: Path):
-        self.llm = make_agent("critic", WORKER_MODEL, (PROMPTS / "critic.md").read_text() + "\n\n" + problem_md,
+        self.llm = make_agent("critic", WORKER_MODEL, (PROMPTS / "critic.md").read_text(encoding="utf-8") + "\n\n" + problem_md,
                             transcript, effort="medium", max_tokens=16000)
 
     def review(self, k, d, y, chk, rationale, sim_report, records, method) -> dict:
@@ -416,7 +416,7 @@ class DryCritic:
 
 class Reporter:
     def __init__(self, transcript: Path):
-        self.llm = make_agent("reporter", WORKER_MODEL, (PROMPTS / "reporter.md").read_text(),
+        self.llm = make_agent("reporter", WORKER_MODEL, (PROMPTS / "reporter.md").read_text(encoding="utf-8"),
                             transcript, effort="medium", max_tokens=16000)
 
     def write(self, make_deliverables, context: str, outdir: Path) -> str:
@@ -427,7 +427,7 @@ class Reporter:
 
         def write_summary(inp):
             out["md"] = inp["markdown"]
-            (outdir / "SUMMARY.md").write_text(inp["markdown"])
+            (outdir / "SUMMARY.md").write_text(encoding="utf-8", data=inp["markdown"])
             return "Written.", False
 
         tools = [Tool("write_tables_and_plots", "Generate D3-D6 from the run records.",
@@ -446,5 +446,5 @@ class DryReporter:
               "This run used the deterministic stand-ins (coordinate-search planner, pass-through simulation agent, "
               "code-only critic, template reporter). It tests the plumbing, simulator and reports; it is not the "
               "agent result for the final report.\n\n" + made + "\n\n" + context)
-        (outdir / "SUMMARY.md").write_text(md)
+        (outdir / "SUMMARY.md").write_text(encoding="utf-8", data=md)
         return md

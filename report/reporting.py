@@ -67,7 +67,7 @@ def row_for(rec: dict, method: str) -> dict:
 def write_iteration_log(records: list[dict], outdir: Path, method: str) -> tuple[Path, Path]:
     rows = [row_for(r, method) for r in records]
     csv_p = outdir / "D3_iteration_log.csv"
-    with csv_p.open("w", newline="") as f:
+    with csv_p.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=[c for c, _ in COLS] + ["planner_rationale"])
         w.writeheader()
         for r, rec in zip(rows, records):
@@ -91,7 +91,7 @@ def write_iteration_log(records: list[dict], outdir: Path, method: str) -> tuple
             cells.append(str(v).replace("|", "/"))
         md.append("| " + " | ".join(cells) + " |")
     md_p = outdir / "D3_iteration_log.md"
-    md_p.write_text("\n".join(md) + "\n")
+    md_p.write_text(encoding="utf-8", data="\n".join(md) + "\n")
     return csv_p, md_p
 
 
@@ -262,7 +262,7 @@ def write_comparison(records: list[dict], outdir: Path, method: str) -> Path:
             lines.append(f"| {k} | {_eng(getattr(B[0], k))} | {_eng(getattr(X[0], k))} |")
         lines.append(f"| beta | {B[0].beta:.4f} | {X[0].beta:.4f} |")
     p = outdir / "D5_comparison.md"
-    p.write_text("\n".join(lines) + "\n")
+    p.write_text(encoding="utf-8", data="\n".join(lines) + "\n")
     return p
 
 
@@ -276,8 +276,8 @@ def export_final(records: list[dict], outdir: Path, method: str, simulate_full) 
     y = simulate_full(d, d6 / "sim")
     for cir in (d6 / "sim").glob("*.cir"):
         shutil.copy(cir, d6 / cir.name)
-    (d6 / "design.json").write_text(json.dumps(d.to_dict(), indent=2))
-    (d6 / "check.json").write_text(json.dumps(check(d, y, method), indent=2, default=str))
+    (d6 / "design.json").write_text(encoding="utf-8", data=json.dumps(d.to_dict(), indent=2))
+    (d6 / "check.json").write_text(encoding="utf-8", data=json.dumps(check(d, y, method), indent=2, default=str))
     _plots_full(d6 / "sim", d6, d)
     return d6
 

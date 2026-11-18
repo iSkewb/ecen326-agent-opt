@@ -73,7 +73,7 @@ class AgentLLM:
         self.use_fallbacks = os.environ.get("CLAUDE_FALLBACKS", "1") != "0"
 
     def _log(self, kind: str, payload) -> None:
-        with self.transcript.open("a") as f:
+        with self.transcript.open("a", encoding="utf-8") as f:
             f.write(json.dumps({"t": time.time(), "role": self.role, "model": self.model,
                                 "kind": kind, "data": payload}, default=str) + "\n")
 

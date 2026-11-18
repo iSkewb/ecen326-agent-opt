@@ -33,11 +33,15 @@ Private for now; to be shared with teammates and the TA later.
 
 ## Setup
 
+Linux or macOS:
+
 ```
-sudo apt install ngspice        # ngspice-42 was used; any recent version should work
+sudo apt install ngspice        # or: brew install ngspice. ngspice-42 was used; any recent version works
 python3 -m pip install -r requirements.txt
 cp .env.example .env
 ```
+
+Windows (PowerShell): see [Windows](#windows) below.
 
 Then pick how the agents reach Claude. Both run the same four agents with the same prompts,
 models and checks; only the transport differs.
@@ -57,6 +61,39 @@ and the reply forced to JSON with `--json-schema`. Claude Code's own tools are s
 empty scratch folder, so an agent can only answer. The JSON names one of the loop's tools
 (for example `propose_candidate` or `run_simulation`); Python runs that tool, including
 ngspice, and sends the result back in the next call.
+
+## Windows
+
+The flow runs on Windows too. Differences from the Linux commands:
+
+1. **Python:** use `python` (or `py`), not `python3`, in every command in this README.
+   ```
+   python -m pip install -r requirements.txt
+   copy .env.example .env
+   ```
+2. **ngspice:** download the newest `ngspice-4x_64.7z` from the ngspice project's SourceForge page
+   (Files > ng-spice-rework > the latest version folder), and extract it with 7-Zip so that
+   `C:\Spice64\bin\ngspice_con.exe` exists. The flow looks there automatically. Use
+   `ngspice_con.exe`, the console build; plain `ngspice.exe` opens a window and is not meant for batch runs.
+   If you put it somewhere else, point the flow at it, either for the current window:
+   ```
+   $env:NGSPICE = "D:\tools\Spice64\bin\ngspice_con.exe"
+   ```
+   or permanently, by adding `NGSPICE=D:\tools\Spice64\bin\ngspice_con.exe` to `.env`.
+   The search order is: `NGSPICE` (environment or `.env`), `ngspice_con` on PATH, `ngspice` on PATH,
+   then `C:\Spice64\bin`, `C:\Spice\bin` and `C:\Program Files\Spice64\bin`. If none is found the
+   run stops with a message listing these options.
+3. **Claude Code backend:** install Claude Code for Windows (the native installer, or
+   `npm install -g @anthropic-ai/claude-code`), open a new PowerShell window and run `claude` once
+   to sign in. Then `python orchestrator.py --backend claude-code`. The flow finds `claude.exe`
+   or `claude.cmd` on PATH; if it is elsewhere, set `CLAUDE_CLI` to its full path in `.env`.
+4. Quick check that everything is wired up, with no Claude calls:
+   ```
+   python orchestrator.py --dry-run --budget 3
+   ```
+
+All files are read and written as UTF-8, and decks use paths relative to their own folder,
+so Windows path separators and code pages do not matter.
 
 ## Running
 
